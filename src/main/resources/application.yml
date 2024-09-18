@@ -1,0 +1,13 @@
+spring:
+  application:
+    name : kafka stream
+  kafka:
+    streams:
+      application-id: app1
+      bootstrap-servers: localhost:9092
+    properties:
+      default:
+        deserialization:
+          exception:
+            handler: com.kafka.stream.exception.DeserializationExceptionHandler
+
