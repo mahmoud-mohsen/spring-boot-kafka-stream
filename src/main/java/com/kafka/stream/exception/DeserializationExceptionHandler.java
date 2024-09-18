@@ -6,6 +6,9 @@ import org.apache.kafka.streams.processor.ProcessorContext;
 
 import java.util.Map;
 
+/**
+ * Custom exception handler to handle the exceptions that can happened in case of deserializing kafka event
+ */
 @Slf4j
 public class DeserializationExceptionHandler implements org.apache.kafka.streams.errors.DeserializationExceptionHandler {
 

@@ -28,10 +28,12 @@ public class GreetingTopology {
 
     @Autowired
     public void process(StreamsBuilder streamsBuilder) {
-        KStream<String, Greeting> stream = streamsBuilder.stream(greeting_topic, Consumed.with(Serdes.String(), new JsonSerde<>(Greeting.class,objectMapper)));
-        KStream<String, Greeting> processedStream = stream.mapValues((s, greeting) -> new Greeting(greeting.getMessage().toUpperCase(Locale.ROOT), greeting.getTimeStamp()));
+        KStream<String, Greeting> stream = streamsBuilder.stream(greeting_topic, Consumed.with(Serdes.String(), new JsonSerde<>(Greeting.class, objectMapper)));
+        KStream<String, Greeting> processedStream = stream.mapValues((s, greeting) -> {
+            return new Greeting(greeting.getMessage().toUpperCase(Locale.ROOT), greeting.getTimeStamp());
+        });
         processedStream.print(Printed.<String, Greeting>toSysOut().withLabel("greeting_processedStream"));
-        processedStream.to(greeting_output_topic, Produced.with(Serdes.String(),new JsonSerde<>(Greeting.class,objectMapper)));
+        processedStream.to(greeting_output_topic, Produced.with(Serdes.String(), new JsonSerde<>(Greeting.class, objectMapper)));
     }
 
 }

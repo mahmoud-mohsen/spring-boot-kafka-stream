@@ -4,6 +4,7 @@ package com.kafka.stream.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kafka.stream.exception.ProcessingExceptionHandler;
 import com.kafka.stream.topology.GreetingTopology;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.StreamsBuilderFactoryBeanConfigurer;
 
 @Configuration
 @Slf4j
@@ -25,7 +27,7 @@ public class KafkaConfiguration {
     }
 
     /**
-     * In case we need to handle the exception using the spring boot deserialization exception handler and take action in case the exception has been happened
+     * In case we need to handle the deserialization exception using the spring boot deserialization exception handler and take action in case the exception has been happened
      */
 //    @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
 //    public KafkaStreamsConfiguration kStreamsConfigs() {
@@ -42,6 +44,18 @@ public class KafkaConfiguration {
 //            log.error("Exception in Consuming Record :: {} with message:: {}", consumerRecord, e.getMessage(), e);
 //        };
 //    }
+
+    /**
+     * override default configuration for UncaughtExceptionHandler to set our handler in case there is an exception happened during event processing
+     */
+    @Bean
+    public StreamsBuilderFactoryBeanConfigurer streamsBuilderFactoryBeanConfigurer() {
+        return factoryBean -> {
+            factoryBean.setStreamsUncaughtExceptionHandler(new ProcessingExceptionHandler());
+        };
+    }
+
+
     @Bean
     public NewTopic greetingTopic() {
         return new NewTopic(GreetingTopology.greeting_topic, 1, (short) 1);
